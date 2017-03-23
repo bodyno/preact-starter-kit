@@ -6,15 +6,7 @@ import CopyWebpackPlugin from 'copy-webpack-plugin'
 import ReplacePlugin from 'replace-bundle-webpack-plugin'
 import OfflinePlugin from 'offline-plugin'
 import path from 'path'
-import V8LazyParseWebpackPlugin from 'v8-lazy-parse-webpack-plugin'
 const ENV = process.env.NODE_ENV || 'development'
-
-const CSS_MAPS = ENV!=='production'
-
-const extractLess = new ExtractTextPlugin({
-  filename: "[name].[contenthash].css",
-  disable: ENV === "development"
-});
 
 module.exports = {
   context: path.resolve(__dirname, "src"),
@@ -34,7 +26,8 @@ module.exports = {
 	output: {
 		path: path.resolve(__dirname, "dist"),
 		publicPath: '/',
-    filename:  ENV == 'development' ? `[name].[hash].js` : '[chunkhash].js',
+    // filename: `[name].[hash].js`,
+    filename: ENV == 'development' ? `[name].[hash].js` : '[chunkhash].js',
     chunkFilename: '[chunkhash].js'
 	},
   resolve: {
@@ -58,22 +51,21 @@ module.exports = {
       loader: 'babel-loader'
     },{
       test: /\.(less|css)$/,
-      use: extractLess.extract({
+      use: ExtractTextPlugin.extract({
         use: [{
           loader: "css-loader",
           options: {
             modules: true,
             importLoaders: 1,
-            sourceMap: CSS_MAPS
+            sourceMap: ENV!=='production'
           }
+        }, {
+          loader: "postcss-loader"
         }, {
           loader: "less-loader"
         }],
         fallback: "style-loader"
       })
-    },{
-      test: /\.json$/,
-      loader: 'json-loader'
     },{
       test: /\.(xml|html|txt|md)$/,
       loader: 'raw-loader'
@@ -107,14 +99,14 @@ module.exports = {
       disable: ENV!=='production'
     }),
     new webpack.LoaderOptionsPlugin({
+      minimize: true,
       options: {
         postcss: [
-          require('autoprefixer')({browsers: ['last 3 version']})
+          autoprefixer({browsers: ['last 3 version']})
         ]
       }
     })
   ]).concat(ENV==='production' ? [
-    new V8LazyParseWebpackPlugin(),
     new webpack.optimize.UglifyJsPlugin({
       output: {
         comments: false
@@ -154,6 +146,17 @@ module.exports = {
         }
       ],
       publicPath: '/'
+    }),
+    new webpack.optimize.CommonsChunkPlugin({
+      name: 'vendor',
+      minChunks: function (module) {
+        // this assumes your vendor imports exist in the node_modules directory
+        return module.context && module.context.indexOf('node_modules') !== -1;
+      }
+    }),
+    //CommonChunksPlugin will now extract all the common modules from vendor and main bundles
+    new webpack.optimize.CommonsChunkPlugin({
+      name: 'manifest' //But since there are no more common modules between them we end up with just the runtime code included in the manifest file
     })
   ] : []),
 
