@@ -5,9 +5,7 @@ import axios from 'axios'
 @bind
 export default class {
   @observable count = 10
-  @observable data = {
-    page: 10
-  }
+  @observable data = []
 
   @action
   plus () {
@@ -16,9 +14,8 @@ export default class {
 
   @action
   fetch () {
-    this.data = {
-      ...this.data,
-      count: 100
-    }
+    axios.get('https://api.github.com/zen').then(({data}) => {
+      this.data.push(data)
+    })
   }
 }

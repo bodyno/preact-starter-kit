@@ -16,9 +16,9 @@ export default class extends Component {
     return (
 			<div class={style.profile}>
         <div>Profile</div>
-        <h1>{countStore.count}</h1>
-        <h1>{countStore.data.page}</h1>
-        <h1>{countStore.data.count}</h1>
+        { countStore.data.map((item, index) =>
+          <h1 key={index}>{item}</h1>
+        )}
         <button onClick={countStore.fetch}>Jump</button>
       </div>
 		)
