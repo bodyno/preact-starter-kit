@@ -20,15 +20,15 @@ module.exports = {
   context: path.resolve(__dirname, "src"),
   entry: {
     app: './index.js',
-    vendor: [
-      'preact',
-      'preact-compat',
-      'preact-router',
-      'preact-async-route',
-      'mobx',
-      'mobx-react',
-      'autobind-decorator'
-    ]
+    // vendor: [
+    //   'preact',
+    //   'preact-compat',
+    //   'preact-router',
+    //   'preact-async-route',
+    //   'mobx',
+    //   'mobx-react',
+    //   'autobind-decorator'
+    // ]
   },
 
 	output: {

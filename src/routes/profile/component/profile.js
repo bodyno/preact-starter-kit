@@ -10,13 +10,16 @@ export default class extends Component {
     route('/')
   }
 
+
 	render () {
     const {countStore} = this.props
     return (
 			<div class={style.profile}>
         <div>Profile</div>
         <h1>{countStore.count}</h1>
-        <button onClick={countStore.plus}>Jump</button>
+        <h1>{countStore.data.page}</h1>
+        <h1>{countStore.data.count}</h1>
+        <button onClick={countStore.fetch}>Jump</button>
       </div>
 		)
 	}
